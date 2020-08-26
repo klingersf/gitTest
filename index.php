@@ -1,36 +1,29 @@
-public function selic_info(?array $data): void
+<?php
+
+$selicData = [
+    "initialDate" => "",
+    "endDate" => "",
+    "percentage" => "",
+    "value" => "12",
+];
+function selic_info(?array $data): void
     {
         $data = filter_var_array($data, FILTER_SANITIZE_STRIPPED);
-        if (!empty($data['csrf'])) {
-            if (!csrf_verify($data)) {
-                $json['message'] = $this->message->error("Erro ao enviar, favor use o formulário")->render();
-                echo json_encode($json);
-                return;
-            }
-
-            if (request_limit("calcDI", 4, 60 * 2)) {
-                $json['message'] = $this->message->error(
-                    "Você já fez 4 solicitações, esse é o limite. Por favor, aguarde 2 minutos para tentar novamente!"
-                )->render();
-                echo json_encode($json);
-                return;
-            }
 
             if (empty($data['initialDate']) || empty($data['endDate']) || empty($data['percentage']) || empty($data['value'])) {
-                $json['message'] = $this->message->warning("Informe todos os dados")->render();
+                $json['message'] = "Informe todos os dados";
                 echo json_encode($json);
                 return;
             }
 
             if ($data['percentage'] < 0 || $data['percentage'] > 200) {
-                $json['message'] = $this->message->warning("O campo 'percentual' deve estar entre os valores 0 e 199,99")->render();
+                $json['message'] = "O campo 'percentual' deve estar entre os valores 0 e 199,99";
                 echo json_encode($json);
                 return;
             }
 
             if ($data['initialDate'] < "1994-07-04" || $data['endDate'] > date('Y-m-d')) {
-//            if ($data['initialDate'] < "1994-07-04") {
-                $json['message'] = $this->message->warning("Período disponível de 04/07/1994 até 22/06/2020")->render();
+                $json['message'] = "Período disponível de 04/07/1994 até 22/06/2020";
                 echo json_encode($json);
                 return;
             }
@@ -42,7 +35,7 @@ public function selic_info(?array $data): void
 //            }
 
             if (isset($data['futureDate'])) {
-                $json['message'] = $this->message->info("Implementar o cálculo depois")->render();
+                $json['message'] = "Implementar o cálculo depois";
                 echo json_encode($json);
                 return;
             }
@@ -54,15 +47,17 @@ public function selic_info(?array $data): void
             $diJson = json_decode($contents);
 
             if (!isset($diJson->valorCalculado)) {
-                $json['message'] = $this->message->warning("Não foi possível realizar o cálculo tente novamente mais tarde")->render();
+                $json['message'] = "Não foi possível realizar o cálculo tente novamente mais tarde";
                 echo json_encode($json);
                 return;
             }
 
-            $json['message'] = $this->message->success("Valor calculado com sucesso!")->render();
+            $json['message'] = "Valor calculado com sucesso!";
             $json['more'] = true;
-            $json['infoResponse'] = $this->infoResponse->selic($diJson)->render();
+            $json['infoResponse'] = $diJson;
             echo json_encode($json);
             return;
-        }
     }
+
+    selic_info($selicData);
+?>
